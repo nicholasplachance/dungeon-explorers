@@ -3,18 +3,21 @@ from scenes.dungeon import Dungeon
 from scenes.victory import VictoryScreen
 from scenes.info import InfoScreen
 
-class GamesState:
+class GameState:
     def __init__(self):
-        self.state = "MENU" # Start in the menu
+        self.state = "MENU"
+        self.previous_state = None
         self.menu = MainMenu(self)
-        self.dungeon = Dungeon(self)
+        self.dungeon = None  # We will create a new dungeon when starting a game
         self.victory = VictoryScreen(self)
-        self.info = None  # Info scene will be created dynamically
+        self.info = None  # Info screen will be created dynamically
 
     def update(self):
         if self.state == "MENU":
             self.menu.update()
         elif self.state == "DUNGEON":
+            if self.dungeon is None:  # Create a fresh dungeon
+                self.dungeon = Dungeon(self)
             self.dungeon.update()
         elif self.state == "VICTORY":
             self.victory.update()
@@ -30,10 +33,12 @@ class GamesState:
             self.victory.render(screen)
         elif self.state == "INFO":
             self.info.render(screen)
-    
+
     def change_state(self, new_state):
-        # If switching to Info, store the previous state
-        if new_state == "INFO":
+        if new_state == "DUNGEON":
+            self.dungeon = Dungeon(self)  # Create a fresh dungeon on new game
+        elif new_state == "INFO":
             self.previous_state = self.state
             self.info = InfoScreen(self, self.previous_state)
+
         self.state = new_state

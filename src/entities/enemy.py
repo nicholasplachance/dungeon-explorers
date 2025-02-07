@@ -11,11 +11,13 @@ class Enemy:
         self.height = self.tile_size // 3.5
         self.speed = 2
         self.health = 20
+        self.max_health = 20  # Store max health to calculate percentage
         self.damage = 5
-        self.attack_range = 60 # Attack if within this distance
-        self.detect_range = 200 # LoS start chasing player if player is within this range
+        self.attack_range = 60  # Attack if within this distance
+        self.detect_range = 200  # Start chasing player if close enough
         self.last_attack_time = 0
-        self.attack_cooldown = 1 # 1 second between attacks
+        self.attack_cooldown = 1  # 1 second between attacks
+        self.font = pygame.font.Font(None, 20)  # Font for health text
 
     def move_towards_player(self, player_x, player_y, dungeon_layout):
         # Moves toward the player if within LoS / detection range
@@ -66,4 +68,36 @@ class Enemy:
             print(f"Enemy attacked! Player HP: {player.health}")
 
     def render(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))  # Red enemy
+        # Draw the enemy
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))
+
+        # Draw the enemy health bar above the enemy
+        self.draw_health_bar(screen)
+    
+    def draw_health_bar(self, screen):
+        """Draws a health bar above the enemy."""
+        bar_width = self.tile_size // 2
+        bar_height = 6
+        bar_x = self.x + (self.width // 2) - (bar_width // 2)
+        bar_y = self.y - 10  # Position slightly above the enemy
+
+        # Background Bar (Gray)
+        pygame.draw.rect(screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height))
+
+        # Calculate health percentage
+        health_percentage = self.health / self.max_health
+        health_width = int(bar_width * health_percentage)
+
+        # Choose health bar color
+        if health_percentage > 0.5:
+            color = (0, 255, 0)  # Green
+        elif health_percentage > 0.2:
+            color = (255, 165, 0)  # Orange
+        else:
+            color = (255, 0, 0)  # Red
+
+        # Health Bar (Dynamic)
+        pygame.draw.rect(screen, color, (bar_x, bar_y, health_width, bar_height))
+
+        # Draw HP text inside the bar
+        hp_text = f"{self.health}/{self.max_health}"

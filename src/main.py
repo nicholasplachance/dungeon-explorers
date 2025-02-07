@@ -1,7 +1,7 @@
 import pygame
 import sys
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_TITLE
-from core.state import GamesState
+from core.state import GameState
 
 # Initialize pygame
 pygame.init()
@@ -14,7 +14,7 @@ pygame.display.set_caption(GAME_TITLE)
 clock = pygame.time.Clock()
 
 # Game state manager
-game_state = GamesState()
+game_state = GameState()
 
 # Main game loop
 running = True
