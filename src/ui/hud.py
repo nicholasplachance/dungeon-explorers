@@ -1,9 +1,10 @@
 import pygame
 
 class HUD:
-    def __init__(self, player):
+    def __init__(self, player, dungeon_name):
         self.player = player
         self.font = pygame.font.Font(None, 28)  # Slightly smaller font for inside text
+        self.dungeon_name = dungeon_name 
         self.health_bar_width = 200
         self.health_bar_height = 20
         self.health_bar_x = 20
@@ -42,3 +43,8 @@ class HUD:
         # Draw Player Damage Text Below HP Bar
         damage_text = self.font.render(f"Damage: {self.player.attack_damage}", True, (255, 255, 255))
         screen.blit(damage_text, (self.health_bar_x, self.health_bar_y + 30))
+
+        # Draw Dungeon Name
+        name_surface = self.font.render(self.dungeon_name, True, (255, 255, 255))
+        name_rect = name_surface.get_rect(center=(screen.get_width() // 2, 20))
+        screen.blit(name_surface, name_rect)

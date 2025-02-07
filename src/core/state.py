@@ -42,11 +42,12 @@ class GameState:
 
     def change_state(self, new_state):
         if new_state == "DUNGEON":
-            self.dungeon = Dungeon(self)  # Create a fresh dungeon on new game
+            self.dungeon = Dungeon(self)  # ✅ Create a fresh dungeon each time
         elif new_state == "INFO":
             self.previous_state = self.state
             self.info = InfoScreen(self, self.previous_state)
         elif new_state == "DEATH":
-            self.death = DeathScreen(self) 
+            self.death = DeathScreen(self)  # ✅ Reset the death screen as well
 
         self.state = new_state
+

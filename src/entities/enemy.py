@@ -67,19 +67,23 @@ class Enemy:
             self.last_attack_time = current_time
             print(f"Enemy attacked! Player HP: {player.health}")
 
-    def render(self, screen):
-        # Draw the enemy
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))
+    def render(self, screen, cam_x, cam_y):
+        """Draws the enemy and their health bar with correct camera positioning."""
+        enemy_x = self.x - cam_x
+        enemy_y = self.y - cam_y
 
-        # Draw the enemy health bar above the enemy
-        self.draw_health_bar(screen)
+        # Draw enemy
+        pygame.draw.rect(screen, (255, 0, 0), (enemy_x, enemy_y, self.width, self.height))
+
+        # Draw health bar above the enemy
+        self.draw_health_bar(screen, enemy_x, enemy_y)
     
-    def draw_health_bar(self, screen):
+    def draw_health_bar(self, screen, enemy_x, enemy_y):
         """Draws a health bar above the enemy."""
         bar_width = self.tile_size // 2
         bar_height = 6
-        bar_x = self.x + (self.width // 2) - (bar_width // 2)
-        bar_y = self.y - 10  # Position slightly above the enemy
+        bar_x = enemy_x + (self.width // 2) - (bar_width // 2)
+        bar_y = enemy_y - 10  # Position slightly above the enemy
 
         # Background Bar (Gray)
         pygame.draw.rect(screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height))
@@ -100,4 +104,7 @@ class Enemy:
         pygame.draw.rect(screen, color, (bar_x, bar_y, health_width, bar_height))
 
         # Draw HP text inside the bar
-        hp_text = f"{self.health}/{self.max_health}"
+        # hp_text = f"{self.health}/{self.max_health}"
+        # text_surface = self.font.render(hp_text, True, (255, 255, 255))
+        # text_rect = text_surface.get_rect(center=(bar_x + bar_width // 2, bar_y + bar_height // 2))
+        # screen.blit(text_surface, text_rect)

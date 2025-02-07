@@ -5,23 +5,39 @@ import random
 from entities.player import Player
 from entities.enemy import Enemy
 from ui.hud import HUD
-
+from settings import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class Dungeon:
     def __init__(self, game_state, level=1):
         self.game_state = game_state
         self.font = pygame.font.Font(None, 36)
         self.tile_size = 80 # Matches JSON tile size
-        self.load_dungeon()
+        self.load_random_dungeon(level)
         self.reset_dungeon(level)
         self.player = Player(self.player_start[0], self.player_start[1], self.tile_size)
-        self.hud = HUD(self.player) # Initialize HUD
+        self.hud = HUD(self.player, self.dungeon_name) # Initialize HUD
         
         # Control difficulty scaling: More enemies on later levels
         enemy_count = min(3 + level * 2, 10)  # Max out at 10 enemies
         self.enemies = self.spawn_enemies(enemy_count)
 
-    
+    def load_random_dungeon(self, level):
+        """Loads a random dungeon of the specified level."""
+        with open("data/levels.json") as f:
+            data = json.load(f)
+            level_dungeons = [d for d in data["dungeons"] if d["level"] == level]
+
+        if not level_dungeons:
+            print(f"No dungeons found for level {level}!")
+            return
+
+        chosen_dungeon = random.choice(level_dungeons)  # ✅ Force new random choice
+        print(f"Loading Dungeon: {chosen_dungeon['name']}")  # Debugging
+
+        self.layout = chosen_dungeon["layout"]
+        self.player_start = chosen_dungeon["player_start"]
+        self.exit_position = chosen_dungeon["exit_position"]
+        self.dungeon_name = chosen_dungeon["name"]
 
     def reset_dungeon(self, level):
         """Resets the dungeon to its default state, including enemies and player health."""
@@ -31,8 +47,7 @@ class Dungeon:
         # Adjust enemy count based on level
         enemy_count = min(3 + level * 2, 10)
         self.enemies = self.spawn_enemies(enemy_count)
-
-    
+ 
     def spawn_enemies(self, num_enemies):
         """Finds random valid tiles and spawns enemies."""
         spawn_locations = []
@@ -104,16 +119,28 @@ class Dungeon:
             self.player.y = self.player_start[1] * self.tile_size
 
     def render(self, screen):
+        # Calculate the dungeon's total width and height
+        dungeon_width = len(self.layout[0]) * self.tile_size
+        dungeon_height = len(self.layout) * self.tile_size
+
+        # Get the camera position, ensuring it doesn't go off the dungeon
+        cam_x, cam_y = self.player.get_camera_position(SCREEN_WIDTH, SCREEN_HEIGHT, dungeon_width, dungeon_height)
+
+        # Render Dungeon Grid with Camera Offset
         for row_index, row in enumerate(self.layout):
             for col_index, tile in enumerate(row):
-                x = col_index * self.tile_size
-                y = row_index * self.tile_size
-                color = (155, 155, 155) if tile == 1 else (10, 10, 10) # White walls, dark floors
-                pygame.draw.rect(screen, color, (x, y , self.tile_size, self.tile_size))
-        
-        self.player.render(screen) # Draw player after rendering the dungeon
-        for enemy in self.enemies:
-            enemy.render(screen)
+                x = col_index * self.tile_size - cam_x
+                y = row_index * self.tile_size - cam_y
+                color = (155, 155, 155) if tile == 1 else (50, 50, 50)
+                pygame.draw.rect(screen, color, (x, y, self.tile_size, self.tile_size))
 
-        # Render HUD
+        # Render Player and Enemies with Camera Offset
+        player_x = self.player.x - cam_x
+        player_y = self.player.y - cam_y
+        pygame.draw.rect(screen, (0, 255, 0), (player_x, player_y, self.player.width, self.player.height))
+
+        for enemy in self.enemies:
+            enemy.render(screen, cam_x, cam_y)  # ✅ Pass camera offsets to enemies
+
+        # Render HUD last so it stays on screen
         self.hud.render(screen)

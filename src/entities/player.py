@@ -53,6 +53,13 @@ class Player:
             self.x = new_x
         if self.can_move(self.x, new_y, dungeon_layout):
             self.y = new_y
+
+    def get_camera_position(self, screen_width, screen_height, dungeon_width, dungeon_height):
+        """Ensures the camera stays within the dungeon boundaries."""
+        cam_x = max(0, min(self.x - screen_width // 2, dungeon_width - screen_width))
+        cam_y = max(0, min(self.y - screen_height // 2, dungeon_height - screen_height))
+        return cam_x, cam_y
+
     
     def render(self, screen):
         pygame.draw.rect(screen, (0, 255, 0), (self.x, self.y, self.width, self.height))

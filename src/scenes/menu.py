@@ -4,7 +4,7 @@ class MainMenu:
     def __init__(self, game_state):
         self.game_state = game_state
         self.font = pygame.font.Font(None, 36)
-        self.options = ["Start Game", "INFO", "Quit"]
+        self.options = ["Start Game", "Info", "Quit"]
         self.selected = 0
 
     def update(self):
