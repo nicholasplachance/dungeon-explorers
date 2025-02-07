@@ -1,6 +1,7 @@
 import pygame
 import json
 from entities.player import Player
+from entities.enemy import Enemy
 
 class Dungeon:
     def __init__(self, game_state):
@@ -9,6 +10,7 @@ class Dungeon:
         self.tile_size = 80 # Matches JSON tile size
         self.load_dungeon()
         self.player = Player(self.player_start[0], self.player_start[1], self.tile_size)
+        self.enemies = [Enemy(5, 5, self.tile_size)]  # Spawn one enemy
 
     def load_dungeon(self):
         with open("data/levels.json") as f:
@@ -31,6 +33,19 @@ class Dungeon:
         if keys[pygame.K_m]:
             self.game_state.change_state("MENU") # Allow return to menu
 
+        if keys[pygame.K_SPACE]:  # Player attacks with spacebar
+            self.player.attack(self.enemies)
+
+        # Enemy logic
+        for enemy in self.enemies:
+            enemy.move_towards_player(self.player.x, self.player.y, self.layout)
+            enemy.attack(self.player)
+
+        # Check if player dies
+        if self.player.health <= 0:
+            print("You Died!")  # TODO: Add a Game Over Screen
+            self.game_state.change_state("MENU")
+
 
         # Check if player has reached the exit
         player_grid_x = self.player.x // self.tile_size
@@ -52,3 +67,5 @@ class Dungeon:
                 pygame.draw.rect(screen, color, (x, y , self.tile_size, self.tile_size))
         
         self.player.render(screen) # Draw player after rendering the dungeon
+        for enemy in self.enemies:
+            enemy.render(screen)

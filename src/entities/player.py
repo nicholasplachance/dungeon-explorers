@@ -1,14 +1,34 @@
 import pygame
-
+import time
 
 class Player:
     def __init__(self, x, y, tile_size):
         self.tile_size = tile_size # 80px tiles
         self.x = x * self.tile_size
         self.y = y * self.tile_size
-        self.width = self.tile_size // 2 # make the player half a tile
-        self.height = self.tile_size // 2
+        self.width = self.tile_size // 3 # make the player half a tile
+        self.height = self.tile_size // 3
         self.speed = 5 # movement speed
+        self.health = 100
+        self.attack_damage = 10
+        self.attack_range = 60
+        self.last_attack_time = 0
+        self.attack_cooldown = 0.5  # Half a second between attacks
+
+    def attack(self, enemies):
+        """Attack any enemy within range."""
+        current_time = time.time()
+        if current_time - self.last_attack_time > self.attack_cooldown:
+            for enemy in enemies:
+                distance = ((self.x - enemy.x) ** 2 + (self.y - enemy.y) ** 2) ** 0.5
+                if distance < self.attack_range:
+                    enemy.health -= self.attack_damage
+                    print(f"Attacked enemy! Enemy HP: {enemy.health}")
+                    if enemy.health <= 0:
+                        enemies.remove(enemy)  # Remove dead enemy
+                        print("Enemy defeated!")
+                    self.last_attack_time = current_time
+                    break  # Only hit one enemy per attack
 
     def can_move(self, new_x, new_y, dungeon_layout):
         """ Checks if all four corners of the player are in a walkable tile """
