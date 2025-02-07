@@ -23,7 +23,12 @@ class Dungeon:
         if keys[pygame.K_s]: self.player.move(0, 1, self.layout)   # Down
         if keys[pygame.K_a]: self.player.move(-1, 0, self.layout)  # Left
         if keys[pygame.K_d]: self.player.move(1, 0, self.layout)   # Right
-        if keys[pygame.K_ESCAPE]:
+
+         # Open Info Screen
+        if keys[pygame.K_i]:
+            self.game_state.change_state("INFO")
+
+        if keys[pygame.K_m]:
             self.game_state.change_state("MENU") # Allow return to menu
 
 

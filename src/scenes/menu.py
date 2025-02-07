@@ -4,7 +4,7 @@ class MainMenu:
     def __init__(self, game_state):
         self.game_state = game_state
         self.font = pygame.font.Font(None, 36)
-        self.options = ["Start Game", "Quit"]
+        self.options = ["Start Game", "INFO", "Quit"]
         self.selected = 0
 
     def update(self):
@@ -17,6 +17,8 @@ class MainMenu:
             if self.selected == 0:
                 self.game_state.change_state("DUNGEON")
             elif self.selected == 1:
+                self.game_state.change_state("INFO") # Open Info screen
+            elif self.selected == 2:
                 pygame.quit()
                 exit()
     
