@@ -86,8 +86,9 @@ class Dungeon:
 
         # Check if player dies
         if self.player.health <= 0:
+            self.game_state.dungeon = None
+            self.game_state.change_state("DEATH")
             print("You Died!")  # TODO: Add a Game Over Screen
-            self.game_state.change_state("MENU")
 
 
         # Check if player has reached the exit

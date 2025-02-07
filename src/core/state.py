@@ -2,6 +2,7 @@ from scenes.menu import MainMenu
 from scenes.dungeon import Dungeon
 from scenes.victory import VictoryScreen
 from scenes.info import InfoScreen
+from scenes.death import DeathScreen
 
 class GameState:
     def __init__(self):
@@ -11,6 +12,7 @@ class GameState:
         self.dungeon = None  # We will create a new dungeon when starting a game
         self.victory = VictoryScreen(self)
         self.info = None  # Info screen will be created dynamically
+        self.death = None 
 
     def update(self):
         if self.state == "MENU":
@@ -23,6 +25,8 @@ class GameState:
             self.victory.update()
         elif self.state == "INFO":
             self.info.update()
+        elif self.state == "DEATH":
+            self.death.update()
 
     def render(self, screen):
         if self.state == "MENU":
@@ -33,6 +37,8 @@ class GameState:
             self.victory.render(screen)
         elif self.state == "INFO":
             self.info.render(screen)
+        elif self.state == "DEATH":
+            self.death.render(screen)
 
     def change_state(self, new_state):
         if new_state == "DUNGEON":
@@ -40,5 +46,7 @@ class GameState:
         elif new_state == "INFO":
             self.previous_state = self.state
             self.info = InfoScreen(self, self.previous_state)
+        elif new_state == "DEATH":
+            self.death = DeathScreen(self) 
 
         self.state = new_state
